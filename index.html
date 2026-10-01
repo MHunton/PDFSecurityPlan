@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security Plan Markup</title>
+</head>
+<body>
+  <header class="toolbar">
+    <strong class="app-name">Security Plan Markup</strong>
+    <label class="btn primary">+ Add PDF<input type="file" id="file" accept="application/pdf,.pdf" multiple hidden></label>
+    <span class="group" id="editTools" hidden>
+      <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
+      <button id="redo" title="Redo (Ctrl+Y)">Redo</button>
+      <button id="deleteDev" title="Delete selected device (Delete)">Delete</button>
+    </span>
+    <span class="spacer"></span>
+    <button id="togglePanel" aria-controls="panel" title="Show or hide the key">Key</button>
+    <span class="group">
+      <button id="zoomOut" aria-label="Zoom out">−</button>
+      <button id="zoomFit">Fit</button>
+      <button id="zoomIn" aria-label="Zoom in">+</button>
+    </span>
+  </header>
+  <nav class="tabs" id="tabs" hidden>
+    <span id="tabList" role="tablist" aria-label="Floors"></span>
+    <button id="editFloors" class="tab-edit">✎ Floors</button>
+  </nav>
+  <div class="work">
+  <main id="viewer">
+    <div id="hint" class="hint"></div>
+    <div id="empty">
+      <p>Add the site plan PDFs to get started.<br>You can add several at once: each page becomes a floor.</p>
+      <div id="resume" class="resume" hidden>
+        <strong>Continue where you left off?</strong>
+        <span id="resumeText" class="muted"></span>
+        <button id="resumeBtn" class="primary">Resume last session</button>
+        <span class="muted">Adding a PDF instead starts a new project and replaces it.</span>
+      </div>
+      <label class="btn primary">+ Add PDF<input type="file" accept="application/pdf,.pdf" multiple hidden></label>
+      <p class="muted">Or drop PDFs here (including one exported from this app, to carry on editing).<br>Files stay on this device. Nothing is uploaded.</p>
+    </div>
+  </main>
+  <aside id="panel" class="panel">
+    <section>
+      <h2>Key</h2>
+      <label class="cat none"><input type="radio" name="brush" id="brushNone" checked> Select only</label>
+      <h3>Cameras</h3>
+      <ul id="cameraTypes" class="cats"></ul>
+      <button id="addCamera">+ Add camera type</button>
+      <h3>Access control</h3>
+      <ul id="accessTypes" class="cats"></ul>
+      <button id="addAccess">+ Add device type</button>
+      <p class="muted">Tick a device, then tap the plan to place it. The box next to the colour is the code shown in its symbol.</p>
+    </section>
+    <section id="devPanel" hidden>
+      <h2>Selected device</h2>
+      <label>Name / label <input id="devLabel" autocomplete="off"></label>
+      <p id="devDup" class="warn" hidden>Another device has this label.</p>
+      <label>Device <select id="devType"></select></label>
+      <div id="camFields" class="cam-fields">
+        <label>Field of view (°) <input id="devFov" type="number" min="5" max="360" step="5" inputmode="numeric"></label>
+        <label>Range (m) <input id="devRange" type="number" min="0.5" step="0.5" inputmode="decimal"></label>
+        <span class="group turn"><button id="turnLeft" title="Turn anticlockwise 15° (Q)">⟲ 15°</button><button id="turnRight" title="Turn clockwise 15° (E)">⟳ 15°</button></span>
+      </div>
+      <label>Model <input id="devModel" autocomplete="off"></label>
+      <div class="cam-fields">
+        <label>IP address <input id="devIp" autocomplete="off" inputmode="decimal" placeholder="e.g. 10.0.1.21"></label>
+        <label>MAC address <input id="devMac" autocomplete="off" placeholder="AA:BB:CC:DD:EE:FF"></label>
+      </div>
+      <p id="ipDup" class="warn" hidden>Another device has this IP address.</p>
+      <div class="photo">
+        <button id="photoView" class="photo-thumb" title="View full size" hidden><img id="photoImg" alt="Snapshot"></button>
+        <span class="group">
+          <label class="btn" id="photoAddLabel">Add snapshot<input type="file" id="photoFile" accept="image/*" hidden></label>
+          <button id="photoRemove" hidden>Remove</button>
+        </span>
+      </div>
+      <label>Notes <textarea id="devNotes" rows="3" placeholder="e.g. mounting height, cable route, door number"></textarea></label>
+    </section>
+    <section id="floorPanel" hidden>
+      <h2>Display</h2>
+      <label class="opacity">Symbol size <input type="range" id="symbolSize" min="0.25" max="3" step="0.25" value="1"> <span id="symbolSizeVal">1×</span></label>
+      <label class="opacity">View cone opacity <input type="range" id="opacity" min="5" max="60" step="5" value="20"> <span id="opacityVal">20%</span></label>
+      <label class="opacity">Drawing scale 1: <input id="scale" type="number" min="1" step="1" inputmode="numeric" placeholder="100"> <span></span></label>
+    </section>
+    <section id="exportPanel" hidden>
+      <h2>Save &amp; export</h2>
+      <label class="check"><input type="checkbox" id="showLegend" checked> Show key on plan (drag to move, corner to resize)</label>
+      <button id="exportPdf" class="primary">Export PDF (all floors)</button>
+      <button id="exportCsv">Device schedule (CSV)</button>
+      <p class="muted">Your work is autosaved in this browser. The exported PDF carries the editable project too: open it with + Add PDF on any computer to carry on.</p>
+    </section>
+  </aside>
+  </div>
+  <footer class="status"><span id="msg"></span><span id="saved"></span><span id="cursor"></span><span id="zoomPct"></span></footer>
+
+  <dialog id="floorDialog">
+    <form method="dialog">
+      <h2>Floors</h2>
+      <p class="muted">Name each floor. Untick pages you don't need, such as cover sheets. Floors are sorted from the lowest level up.</p>
+      <ol class="floor-rows"></ol>
+      <div class="actions">
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="ok" class="primary">Done</button>
+      </div>
+    </form>
+  </dialog>
+  <dialog id="photoDialog" class="photo-dialog">
+    <form method="dialog">
+      <img id="photoFull" alt="Snapshot">
+      <div class="actions"><span id="photoCaption" class="muted"></span><span class="spacer"></span><button class="primary">Close</button></div>
+    </form>
+  </dialog>
+  <datalist id="floorNames">
+    <option>Basement</option><option>Lower ground floor</option><option>Ground floor</option>
+    <option>Upper ground floor</option><option>Mezzanine</option><option>First floor</option>
+    <option>Second floor</option><option>Third floor</option><option>Fourth floor</option>
+    <option>Fifth floor</option><option>Sixth floor</option><option>Seventh floor</option>
+    <option>Eighth floor</option><option>Ninth floor</option><option>Tenth floor</option><option>Roof</option>
+  </datalist>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
